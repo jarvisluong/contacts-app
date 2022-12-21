@@ -1,16 +1,15 @@
-import * as React from 'react';
-import { Button, View, Text } from 'react-native';
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import * as React from "react";
+import { Button, View, Text } from "react-native";
+import { RootStackNavigation } from "../router/routes";
 
-export default function ContactList({ navigation }) {
+type Props = NativeStackScreenProps<RootStackNavigation>;
+
+export default function ContactList({ navigation }: Props) {
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
       <Text>Home Screen</Text>
-      <Button
-        title="Go to Details"
-        onPress={() => navigation.navigate('Details')}
-      />
+      <Button title="Go to Details" onPress={() => {}} />
     </View>
   );
 }
-
-ContactList.screenName = "Contacts"
