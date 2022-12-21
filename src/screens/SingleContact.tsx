@@ -16,7 +16,7 @@ type Props = NativeStackScreenProps<
 export default function SingleContact({ route }: Props) {
   const contact = useSingleContact(route.params.id);
   const setFavorite = useSetFavoriteAction();
-  const { id: favoriteContactId } = useFavoriteContact();
+  const { id: favoriteContactId } = useFavoriteContact() ?? {};
 
   const isFavorited = favoriteContactId === route.params.id;
   return (
@@ -28,7 +28,11 @@ export default function SingleContact({ route }: Props) {
           .map((phoneNumber) => phoneNumber.number)
           .join(", ")}
       </Text>
-      <Text>Email: {contact.emails.map((email) => email.email).join(",")}</Text>
+      {!!contact.emails && (
+        <Text>
+          Email: {contact.emails.map((email) => email.email).join(",")}
+        </Text>
+      )}
       {!!contact.birthday && (
         <Text>
           Birthday: {contact.birthday.day}-{contact.birthday.month + 1}-

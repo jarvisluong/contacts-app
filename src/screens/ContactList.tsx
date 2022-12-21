@@ -70,6 +70,7 @@ export default function ContactList({ navigation }: Props) {
             index,
           })}
           ListHeaderComponent={() => {
+            if (!favoriteContact) return null;
             return (
               <>
                 <ContactRow

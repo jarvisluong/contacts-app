@@ -92,7 +92,7 @@ export function useSingleContact(id: string) {
   const { contacts } = useContacts();
   return useMemo(
     () => contacts.find((contact) => contact.id === id),
-    [contacts]
+    [contacts, id]
   );
 }
 
