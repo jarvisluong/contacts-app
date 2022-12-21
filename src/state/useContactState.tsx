@@ -81,6 +81,18 @@ export function useSortedContacts() {
   }, [contacts]);
 }
 
+export function useFavoriteContact() {
+  return useContacts().favoriteContactId;
+}
+
+export function useSingleContact(id: string) {
+  const { contacts } = useContacts();
+  return useMemo(
+    () => contacts.find((contact) => contact.id === id),
+    [contacts]
+  );
+}
+
 export function useAddContactsAction() {
   const { dispatch } = useContactContext();
   return useCallback(
