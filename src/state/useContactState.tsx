@@ -69,20 +69,23 @@ export function useContacts() {
   return state;
 }
 
-export function useSortedContacts() {
-  const { contacts } = useContacts();
+export function useSortedContactsWithoutFavorite() {
+  const { contacts, favoriteContactId } = useContacts();
   return useMemo(() => {
-    return contacts.sort((contactA, contactB) => {
-      if (!contactA.firstName) {
-        return -1;
-      }
-      return contactA.firstName.localeCompare(contactB.firstName);
-    });
+    return contacts
+      .sort((contactA, contactB) => {
+        if (!contactA.firstName) {
+          return -1;
+        }
+        return contactA.firstName.localeCompare(contactB.firstName);
+      })
+      .filter((contact) => favoriteContactId !== contact.id);
   }, [contacts]);
 }
 
 export function useFavoriteContact() {
-  return useContacts().favoriteContactId;
+  const { favoriteContactId } = useContacts();
+  return useSingleContact(favoriteContactId);
 }
 
 export function useSingleContact(id: string) {

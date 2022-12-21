@@ -7,7 +7,8 @@ import RowSeperator from "../components/RowSeperator";
 import { RootStackNavigation, ROUTES } from "../router/routes";
 import {
   useAddContactsAction,
-  useSortedContacts,
+  useFavoriteContact,
+  useSortedContactsWithoutFavorite,
 } from "../state/useContactState";
 
 type Props = NativeStackScreenProps<
@@ -20,7 +21,8 @@ export default function ContactList({ navigation }: Props) {
     React.useState<Contacts.PermissionStatus>();
 
   const addContacts = useAddContactsAction();
-  const contacts = useSortedContacts();
+  const contacts = useSortedContactsWithoutFavorite();
+  const favoriteContact = useFavoriteContact();
 
   React.useEffect(() => {
     (async () => {
@@ -67,6 +69,26 @@ export default function ContactList({ navigation }: Props) {
             offset: 50 * index,
             index,
           })}
+          ListHeaderComponent={() => {
+            return (
+              <>
+                <ContactRow
+                  displayLabel={`Favorite: ${favoriteContact.firstName ?? ""} ${
+                    favoriteContact.lastName ?? ""
+                  }`}
+                  onPress={() => {
+                    navigation.push(ROUTES.contactDetail, {
+                      id: favoriteContact.id,
+                      title: `${favoriteContact.firstName ?? ""} ${
+                        favoriteContact.lastName ?? ""
+                      }`,
+                    });
+                  }}
+                />
+                <RowSeperator />
+              </>
+            );
+          }}
           renderItem={({ item }) => {
             const displayLabel = `${item.firstName ?? ""} ${
               item.lastName ?? ""
@@ -74,7 +96,6 @@ export default function ContactList({ navigation }: Props) {
             return (
               <ContactRow
                 onPress={() => {
-                  console.log(item);
                   navigation.push(ROUTES.contactDetail, {
                     id: item.id,
                     title: displayLabel,

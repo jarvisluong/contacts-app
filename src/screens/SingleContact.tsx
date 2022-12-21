@@ -16,7 +16,7 @@ type Props = NativeStackScreenProps<
 export default function SingleContact({ route }: Props) {
   const contact = useSingleContact(route.params.id);
   const setFavorite = useSetFavoriteAction();
-  const favoriteContactId = useFavoriteContact();
+  const { id: favoriteContactId } = useFavoriteContact();
 
   const isFavorited = favoriteContactId === route.params.id;
   return (
