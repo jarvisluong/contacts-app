@@ -1,14 +1,26 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import * as Contacts from "expo-contacts";
 import * as React from "react";
-import { Button, View, Text } from "react-native";
-import { RootStackNavigation } from "../router/routes";
+import { View, Text, FlatList } from "react-native";
+import ContactRow from "../components/ContactRow";
+import RowSeperator from "../components/RowSeperator";
+import { RootStackNavigation, ROUTES } from "../router/routes";
+import {
+  useAddContactsAction,
+  useSortedContacts,
+} from "../state/useContactState";
 
-type Props = NativeStackScreenProps<RootStackNavigation>;
+type Props = NativeStackScreenProps<
+  RootStackNavigation,
+  typeof ROUTES.contacts
+>;
 
 export default function ContactList({ navigation }: Props) {
   const [contactPermissionResponse, setContactPermissionResponse] =
     React.useState<Contacts.PermissionStatus>();
+
+  const addContacts = useAddContactsAction();
+  const contacts = useSortedContacts();
 
   React.useEffect(() => {
     (async () => {
@@ -16,6 +28,25 @@ export default function ContactList({ navigation }: Props) {
       setContactPermissionResponse(status);
     })();
   }, []);
+
+  React.useEffect(() => {
+    if (contactPermissionResponse === Contacts.PermissionStatus.GRANTED) {
+      (async () => {
+        const { data } = await Contacts.getContactsAsync({
+          fields: [
+            Contacts.Fields.Emails,
+            Contacts.Fields.PhoneNumbers,
+            Contacts.Fields.FirstName,
+            Contacts.Fields.LastName,
+            Contacts.Fields.Addresses,
+            Contacts.Fields.Birthday,
+          ],
+          pageSize: 500,
+        });
+        addContacts(data);
+      })();
+    }
+  }, [contactPermissionResponse, addContacts]);
 
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
@@ -26,10 +57,34 @@ export default function ContactList({ navigation }: Props) {
         <Text>Awaiting the permission to access phone contacts</Text>
       )}
       {contactPermissionResponse === Contacts.PermissionStatus.GRANTED && (
-        <>
-          <Text>Home Screen</Text>
-          <Button title="Go to Details" onPress={() => {}} />
-        </>
+        <FlatList
+          style={{ flex: 1, width: "100%" }}
+          data={contacts}
+          keyExtractor={(item) => item.id}
+          ItemSeparatorComponent={RowSeperator}
+          getItemLayout={(data, index) => ({
+            length: 50,
+            offset: 50 * index,
+            index,
+          })}
+          renderItem={({ item }) => {
+            const displayLabel = `${item.firstName ?? ""} ${
+              item.lastName ?? ""
+            }`;
+            return (
+              <ContactRow
+                onPress={() => {
+                  console.log(item);
+                  navigation.push(ROUTES.contactDetail, {
+                    id: item.id,
+                    title: displayLabel,
+                  });
+                }}
+                displayLabel={displayLabel}
+              />
+            );
+          }}
+        />
       )}
     </View>
   );

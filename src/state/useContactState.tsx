@@ -6,17 +6,9 @@ import {
   Reducer,
   Dispatch,
   useCallback,
+  useMemo,
 } from "react";
-
-export type Contact = {
-  firstName: string;
-  lastName: string;
-  email?: string;
-  phoneNumber?: string;
-  addresses?: string;
-  birthDate?: string;
-  id: string;
-};
+import { Contact } from "expo-contacts";
 
 type ContactState = {
   contacts: Contact[];
@@ -42,7 +34,7 @@ const contactReducer: Reducer<ContactState, Actions> = (prevState, action) => {
     case "addContacts":
       return {
         ...prevState,
-        contacts: [...prevState.contacts, ...action.payload],
+        contacts: action.payload,
       };
     case "setFavorite":
       return {
@@ -75,6 +67,18 @@ function useContactContext() {
 export function useContacts() {
   const { state } = useContactContext();
   return state;
+}
+
+export function useSortedContacts() {
+  const { contacts } = useContacts();
+  return useMemo(() => {
+    return contacts.sort((contactA, contactB) => {
+      if (!contactA.firstName) {
+        return -1;
+      }
+      return contactA.firstName.localeCompare(contactB.firstName);
+    });
+  }, [contacts]);
 }
 
 export function useAddContactsAction() {
